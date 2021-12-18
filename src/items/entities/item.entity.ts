@@ -35,7 +35,9 @@ export class Item extends CreateUpdateAt {
   @ManyToOne(() => Type, (type) => type.items, { eager: true })
   type: Type;
 
-  @ManyToOne(() => Category, (category) => category.items, { eager: true })
+  @ManyToOne(() => Category, (category) => category.items, {
+    onDelete: 'SET NULL',
+  })
   category: Category;
 
   @ManyToOne(() => Department, (department) => department.items)

@@ -1,7 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Request } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { LogsService } from 'src/logs/logs.service';
+import { User } from 'src/users/entities/user.entity';
 import { Like, Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -10,11 +12,13 @@ import { Category } from './entities/category.entity';
 @Injectable()
 export class CategoryService {
   constructor(
+    private readonly logsService: LogsService,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
   ) {}
   create(createCategoryDto: CreateCategoryDto) {
     const category = this.categoryRepository.create(createCategoryDto);
+    this.logsService.create({ action: 'Create a category' });
     return this.categoryRepository.save(category);
   }
 
@@ -31,7 +35,7 @@ export class CategoryService {
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
-
+    this.logsService.create({ action: 'Get all categories' });
     return paginate<Category>(
       this.categoryRepository,
       {
@@ -52,6 +56,7 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(`category with id: ${id} not found`);
     }
+    this.logsService.create({ action: `Update category with id: ${id}` });
     return this.categoryRepository.save(category);
   }
 
@@ -61,7 +66,9 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(`category with id: ${id} not found`);
     }
-
+    this.logsService.create({
+      action: `Remove category with name: ${category.name}`,
+    });
     return this.categoryRepository.remove(category);
   }
 }

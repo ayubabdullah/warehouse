@@ -27,12 +27,11 @@ export class Employee extends CreateUpdateAt {
   startedAt: Date;
   @Column()
   note: string;
-  @OneToOne(() => User, (user) => user.employee, {
-    onDelete: 'CASCADE',
-    eager: true,
-  })
+  @OneToOne(() => User, (user) => user.employee)
   @JoinColumn()
   user: User;
-  @ManyToOne(() => Department, (department) => department.employees, {eager: true})
+  @ManyToOne(() => Department, (department) => department.employees, {
+    eager: true,
+  })
   department: Department;
 }

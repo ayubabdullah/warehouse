@@ -5,9 +5,10 @@ import { Department } from './entities/department.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesModule } from 'src/employees/employees.module';
 import { ItemsModule } from 'src/items/items.module';
+import { LogsModule } from 'src/logs/logs.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Department]),EmployeesModule, ItemsModule],
+  imports: [TypeOrmModule.forFeature([Department]),EmployeesModule, ItemsModule, LogsModule],
   controllers: [DepartmentsController],
   providers: [DepartmentsService],
 })

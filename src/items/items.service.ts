@@ -18,10 +18,12 @@ import * as faker from 'faker';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Employee } from 'src/employees/entities/employee.entity';
+import { LogsService } from 'src/logs/logs.service';
 
 @Injectable()
 export class ItemsService {
   constructor(
+    private readonly logsService: LogsService,
     @InjectRepository(Item) private readonly itemRepository: Repository<Item>,
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
@@ -42,7 +44,7 @@ export class ItemsService {
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
-
+    this.logsService.create({ action: `Get All Items` });
     return paginate<Item>(
       this.itemRepository,
       {
@@ -53,13 +55,13 @@ export class ItemsService {
       query,
     );
   }
-  async findOneById(id: string) {
+  async findOne(id: number) {
     const item = await this.itemRepository.findOne(id);
 
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
-
+    this.logsService.create({ action: `Get single item this id: ${id}` });
     return item;
   }
 
@@ -82,6 +84,7 @@ export class ItemsService {
 
     const item = await this.itemRepository.create(createItemDto);
     item.department = department;
+    this.logsService.create({ action: `Create an item` });
     return this.itemRepository.save(item);
   }
   async update(
@@ -113,7 +116,7 @@ export class ItemsService {
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
-
+    this.logsService.create({ action: `Update item this id: ${id}` });
     return this.itemRepository.save(item);
   }
   async remove(departmentId: number, user: User, id: string) {
@@ -136,6 +139,7 @@ export class ItemsService {
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
+    this.logsService.create({ action: `Delete item with name: ${item.name}` });
     return this.itemRepository.remove(item);
   }
 }

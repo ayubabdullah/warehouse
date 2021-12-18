@@ -12,11 +12,11 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RoleGuard } from './auth/guards/role.guard';
-import { ItemsController } from './items/items.controller';
+
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       useFactory: () => ({
         type: 'mysql',
@@ -52,4 +52,3 @@ import { ItemsController } from './items/items.controller';
   ],
 })
 export class AppModule {}
-

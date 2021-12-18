@@ -15,6 +15,6 @@ export class Category extends CreateUpdateAt {
   id: number;
   @Column()
   name: string;
-  @OneToMany(() => Item, (item) => item.category)
+  @OneToMany(() => Item, (item) => item.category,{onDelete: "SET NULL"})
   items: Item[];
 }

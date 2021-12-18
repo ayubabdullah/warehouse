@@ -25,6 +25,7 @@ export class User extends CreateUpdateAt {
   password: string;
   @OneToOne(() => Employee, (employee) => employee.user, {
     onDelete: 'CASCADE',
+    
   })
   employee: Employee;
 
