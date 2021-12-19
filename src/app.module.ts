@@ -12,6 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RoleGuard } from './auth/guards/role.guard';
+import { OrdersModule } from './orders/orders.module';
+import { OrderItemsModule } from './order-items/order-items.module';
 
 
 @Module({
@@ -38,6 +40,8 @@ import { RoleGuard } from './auth/guards/role.guard';
     AuthModule,
     TypesModule,
     CategoryModule,
+    OrdersModule,
+    OrderItemsModule,
   ],
   controllers: [],
   providers: [

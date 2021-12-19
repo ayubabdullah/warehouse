@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { LogsService } from 'src/logs/logs.service';
 import { Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,10 +11,12 @@ import { User } from './entities/user.entity';
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly logsService: LogsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
   create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create(createUserDto);
+    this.logsService.create({ action: `Create a user` });
     return this.userRepository.save(user);
   }
 
@@ -30,7 +33,7 @@ export class UsersService {
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
-
+    this.logsService.create({ action: `Get all users` });
     return paginate<User>(
       this.userRepository,
       {
@@ -47,6 +50,7 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`user with id: ${id} not found`);
     }
+    this.logsService.create({ action: `Get single user with id: ${id}` });
     return user;
   }
 
@@ -55,11 +59,15 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`user with id: ${id} not found`);
     }
+    this.logsService.create({ action: `Update user with id: ${id}` });
     return this.userRepository.save(user);
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
+    this.logsService.create({
+      action: `Delete user with phone number: ${user.phone}`,
+    });
     return this.userRepository.remove(user);
   }
 }

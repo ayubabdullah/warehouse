@@ -1,6 +1,7 @@
 import { Category } from 'src/category/entities/category.entity';
 import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
 import { Department } from 'src/departments/entities/department.entity';
+import { OrderItem } from 'src/order-items/entities/order-item.entity';
 import { Type } from 'src/types/entities/type.entity';
 import {
   Entity,
@@ -11,6 +12,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  OneToOne,
 } from 'typeorm';
 
 @Entity('items')
@@ -42,4 +44,6 @@ export class Item extends CreateUpdateAt {
 
   @ManyToOne(() => Department, (department) => department.items)
   department: Department;
+  @OneToOne(() => OrderItem, orderItem => orderItem.item)
+  orderItem: OrderItem;
 }
