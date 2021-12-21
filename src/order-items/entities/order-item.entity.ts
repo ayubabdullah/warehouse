@@ -7,9 +7,8 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 export class OrderItem extends CreateUpdateAt {
   @Column()
   quantity: number;
-  @ManyToOne(() => Order, (order) => order.orderItems)
+  @ManyToOne(() => Order, (order) => order.orderItems, { eager: true })
   order: Order;
-  @OneToOne(() => Item, (item) => item.orderItem)
-  @JoinColumn()
+  @ManyToOne(() => Item, (item) => item.orderItems, { eager: true })
   item: Item;
 }

@@ -13,12 +13,11 @@ import {
   ManyToMany,
   JoinTable,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('items')
 export class Item extends CreateUpdateAt {
-  @PrimaryGeneratedColumn()
-  id: number;
   @Column()
   name: string;
   @Column({ nullable: true })
@@ -32,9 +31,11 @@ export class Item extends CreateUpdateAt {
   @Column()
   address: string;
   @Column()
+  quantity: number;
+  @Column()
   note: string;
 
-  @ManyToOne(() => Type, (type) => type.items, { eager: true })
+  @ManyToOne(() => Type, (type) => type.items, { onDelete: 'SET NULL' })
   type: Type;
 
   @ManyToOne(() => Category, (category) => category.items, {
@@ -44,6 +45,6 @@ export class Item extends CreateUpdateAt {
 
   @ManyToOne(() => Department, (department) => department.items)
   department: Department;
-  @OneToOne(() => OrderItem, orderItem => orderItem.item)
-  orderItem: OrderItem;
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
+  orderItems: OrderItem[];
 }

@@ -1,4 +1,10 @@
-import { IsNumber, IsObject, IsOptional, IsPositive, IsString } from 'class-validator';
+import {
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 import { Category } from 'src/category/entities/category.entity';
 import { Department } from 'src/departments/entities/department.entity';
 import { Type } from 'src/types/entities/type.entity';
@@ -17,6 +23,9 @@ export class CreateItemDto {
   serial: string;
   @IsString()
   address: string;
+  @IsNumber()
+  @IsPositive()
+  quantity: number;
   @IsString()
   @IsOptional()
   note: string;

@@ -41,6 +41,7 @@ export class ItemsService {
       query.select = ['id', ...fields, 'createdAt'];
     }
     query.order = { createdAt: -1 };
+    query.relations = ['orderItems'];
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
@@ -56,7 +57,7 @@ export class ItemsService {
     );
   }
   async findOne(id: number) {
-    const item = await this.itemRepository.findOne(id);
+    const item = await this.itemRepository.findOne(id, {relations:['orderItems']});
 
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
