@@ -6,7 +6,6 @@ import {
   IsString,
 } from 'class-validator';
 import { Category } from 'src/category/entities/category.entity';
-import { Department } from 'src/departments/entities/department.entity';
 import { Type } from 'src/types/entities/type.entity';
 
 export class CreateItemDto {

@@ -1,9 +1,9 @@
-import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Base } from 'src/common/entities/base.entity';
 import { OrderItem } from 'src/order-items/entities/order-item.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('orders')
-export class Order extends CreateUpdateAt {
+export class Order extends Base {
   @Column()
   clientName: string;
   @Column()

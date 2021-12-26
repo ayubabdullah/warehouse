@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Query } from '@nestjs/common';
 import { EmployeesService } from './employees.service';
-import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Employee } from './entities/employee.entity';
-import { User } from 'src/users/entities/user.entity';
-import {AuthUser} from 'src/common/decorators/auth-user.decorator'
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
+@Roles(Role.ADMIN)
 @Controller('employees')
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}

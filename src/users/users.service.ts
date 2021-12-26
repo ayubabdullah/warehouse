@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
-import { Log } from 'src/logs/entities/log.entity';
 import { LogsService } from 'src/logs/logs.service';
 import { Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,10 +14,14 @@ export class UsersService {
     private readonly logsService: LogsService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create(createUserDto);
+    await this.userRepository.save(user);
     this.logsService.create({ action: `Create a user` });
-    return this.userRepository.save(user);
+    return {
+      success: true,
+      data: user,
+    };
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<User>> {
@@ -52,24 +55,37 @@ export class UsersService {
       throw new NotFoundException(`user with id: ${id} not found`);
     }
     this.logsService.create({ action: `Get single user with id: ${id}` });
-    return user;
+    return {
+      success: true,
+      data: user,
+    };
   }
 
-  
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({ id, ...updateUserDto });
     if (!user) {
       throw new NotFoundException(`user with id: ${id} not found`);
     }
+    await this.userRepository.save(user);
     this.logsService.create({ action: `Update user with id: ${id}` });
-    return this.userRepository.save(user);
+    return {
+      success: true,
+      data: user,
+    };
   }
 
   async remove(id: number) {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`user with id: ${id} not found`);
+    }
+    await this.userRepository.remove(user);
     this.logsService.create({
       action: `Delete user with phone number: ${user.phone}`,
     });
-    return this.userRepository.remove(user);
+    return {
+      success: true,
+      data: user,
+    };
   }
 }

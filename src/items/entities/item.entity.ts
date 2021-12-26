@@ -1,23 +1,12 @@
 import { Category } from 'src/category/entities/category.entity';
-import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Base } from 'src/common/entities/base.entity';
 import { Department } from 'src/departments/entities/department.entity';
 import { OrderItem } from 'src/order-items/entities/order-item.entity';
 import { Type } from 'src/types/entities/type.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
-  OneToOne,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity('items')
-export class Item extends CreateUpdateAt {
+export class Item extends Base {
   @Column()
   name: string;
   @Column({ nullable: true })
@@ -32,19 +21,18 @@ export class Item extends CreateUpdateAt {
   address: string;
   @Column()
   quantity: number;
-  @Column()
+  @Column({ nullable: true })
   note: string;
 
-  @ManyToOne(() => Type, (type) => type.items, { onDelete: 'SET NULL' })
+  @ManyToOne(() => Type, (type) => type.items)
   type: Type;
 
-  @ManyToOne(() => Category, (category) => category.items, {
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne(() => Category, (category) => category.items)
   category: Category;
 
   @ManyToOne(() => Department, (department) => department.items)
   department: Department;
+
   @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
   orderItems: OrderItem[];
 }

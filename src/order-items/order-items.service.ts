@@ -4,11 +4,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { QueryDto } from 'src/common/dto/query.dto';
 import { Item } from 'src/items/entities/item.entity';
 import { Order } from 'src/orders/entities/order.entity';
-import { Like, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 import { UpdateOrderItemDto } from './dto/update-order-item.dto';
 import { OrderItem } from './entities/order-item.entity';
@@ -40,7 +38,11 @@ export class OrderItemsService {
 
     item.quantity -= quantity;
     await this.itemRepository.save(item);
-    return this.orderItemRepository.save(orderItem);
+    await this.orderItemRepository.save(orderItem);
+    return {
+      success: true,
+      data: orderItem
+    }
   }
 
   async update(
@@ -84,7 +86,11 @@ export class OrderItemsService {
       ...updateOrderItemDto,
     });
 
-    return this.orderItemRepository.save(orderItem);
+    await this.orderItemRepository.save(orderItem);
+    return {
+      success: true,
+      data: orderItem,
+    };
   }
 
   async remove(orderId: number, id: number) {
@@ -106,6 +112,10 @@ export class OrderItemsService {
     }
     orderItem.item.quantity += orderItem.quantity;
     await this.itemRepository.save(orderItem.item);
-    return this.orderItemRepository.remove(orderItem);
+    await this.orderItemRepository.remove(orderItem);
+    return {
+      success: true,
+      data: orderItem,
+    };
   }
 }

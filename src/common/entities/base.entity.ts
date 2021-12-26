@@ -4,12 +4,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export class CreateUpdateAt {
+export class Base {
   @PrimaryGeneratedColumn()
   id: number;
   @CreateDateColumn()
   createdAt: Date;
-
   @UpdateDateColumn()
   updatedAt: Date;
 }

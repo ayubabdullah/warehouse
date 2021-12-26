@@ -41,17 +41,18 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Get(':id/logs')
-  findUserLogs(@Param('id') id: string, @Query() queryDto: QueryDto) {
-    return this.logsService.findUserLogs(+id, queryDto);
-  }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
-
+  
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+  //Get User's Logs
+  @Get(':id/logs')
+  findUserLogs(@Param('id') id: string, @Query() queryDto: QueryDto) {
+    return this.logsService.findUserLogs(+id, queryDto);
   }
 }

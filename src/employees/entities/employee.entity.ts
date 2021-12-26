@@ -1,20 +1,11 @@
-import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Base } from 'src/common/entities/base.entity';
 import { Genders } from 'src/common/enums/gender.enum';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity('employees')
-export class Employee extends CreateUpdateAt {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Employee extends Base {
   @Column()
   name: string;
   @Column()
@@ -30,8 +21,6 @@ export class Employee extends CreateUpdateAt {
   @OneToOne(() => User, (user) => user.employee)
   @JoinColumn()
   user: User;
-  @ManyToOne(() => Department, (department) => department.employees, {
-    eager: true,
-  })
+  @ManyToOne(() => Department, (department) => department.employees)
   department: Department;
 }

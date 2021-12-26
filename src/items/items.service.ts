@@ -8,11 +8,7 @@ import { Like, Repository } from 'typeorm';
 import { CreateItemDto } from './dtos/create-item.dto';
 import { UpdateItemDto } from './dtos/update-item.dto';
 import { Item } from './entities/item.entity';
-import {
-  paginate,
-  Pagination,
-  IPaginationOptions,
-} from 'nestjs-typeorm-paginate';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -40,7 +36,6 @@ export class ItemsService {
       query.select = ['id', ...fields, 'createdAt'];
     }
     query.order = { createdAt: -1 };
-    query.relations = ['orderItems'];
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
@@ -55,14 +50,62 @@ export class ItemsService {
       query,
     );
   }
+  async findDepartmentItems(
+    departmentId: number,
+    queryDto: QueryDto,
+  ): Promise<Pagination<Item>> {
+    const department = await this.departmentRepository.findOne(departmentId);
+    if (!department) {
+      throw new NotFoundException(
+        `department with id: ${departmentId} not found`,
+      );
+    }
+
+    let query: any = {};
+    const page = queryDto.page || 1;
+    const limit = queryDto.limit || 25;
+    query.order = { createdAt: -1 };
+    query.where = { department };
+
+    this.logsService.create({ action: `Get department's items` });
+    return paginate<Item>(
+      this.itemRepository,
+      {
+        page,
+        limit,
+        route: `http://localhost:5000/api/v1/departments/${departmentId}/items`,
+      },
+      query,
+    );
+  }
   async findOne(id: number) {
-    const item = await this.itemRepository.findOne(id, {relations:['orderItems']});
+    const item = await this.itemRepository.findOne(id);
 
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
     this.logsService.create({ action: `Get single item this id: ${id}` });
-    return item;
+    return {
+      success: true,
+      data: item,
+    };
+  }
+  async findDepartmentItem(departmentId: number, id: number) {
+    const item = await this.itemRepository.findOne(id,{relations: ['department']});
+
+    if (!item) {
+      throw new NotFoundException(`item with id: ${id} not found`);
+    }
+    if (!(item.department.id === departmentId)) {
+      throw new UnauthorizedException(
+        `item ${id} doesn't belonge to this department`,
+      );
+    }
+    this.logsService.create({ action: `Get single item this id: ${id}` });
+    return {
+      success: true,
+      data: item,
+    };
   }
 
   async create(departmentId: number, user: User, createItemDto: CreateItemDto) {
@@ -84,21 +127,19 @@ export class ItemsService {
 
     const item = await this.itemRepository.create(createItemDto);
     item.department = department;
+    await this.itemRepository.save(item);
     this.logsService.create({ action: `Create an item` });
-    return this.itemRepository.save(item);
+    return {
+      success: true,
+      data: item,
+    };
   }
   async update(
     departmentId: number,
     user: User,
-    id: string,
+    id: number,
     updateItemDto: UpdateItemDto,
   ) {
-    const department = await this.departmentRepository.findOne(departmentId);
-    if (!department) {
-      throw new NotFoundException(
-        `department with id: ${departmentId} not found`,
-      );
-    }
     const employee = await this.employeeRepository.findOne({ user });
     if (!employee) {
       throw new NotFoundException(`employee with id: ${user.id} not found`);
@@ -109,7 +150,7 @@ export class ItemsService {
       );
     }
     const item = await this.itemRepository.preload({
-      id: +id,
+      id,
       ...updateItemDto,
     });
 
@@ -117,15 +158,13 @@ export class ItemsService {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
     this.logsService.create({ action: `Update item this id: ${id}` });
-    return this.itemRepository.save(item);
+    await this.itemRepository.save(item);
+    return {
+      success: true,
+      data: item,
+    };
   }
-  async remove(departmentId: number, user: User, id: string) {
-    const department = await this.departmentRepository.findOne(departmentId);
-    if (!department) {
-      throw new NotFoundException(
-        `department with id: ${departmentId} not found`,
-      );
-    }
+  async remove(departmentId: number, user: User, id: number) {
     const employee = await this.employeeRepository.findOne({ user });
     if (!employee) {
       throw new NotFoundException(`employee with id: ${user.id} not found`);
@@ -140,6 +179,10 @@ export class ItemsService {
       throw new NotFoundException(`item with id: ${id} not found`);
     }
     this.logsService.create({ action: `Delete item with name: ${item.name}` });
-    return this.itemRepository.remove(item);
+    await this.itemRepository.remove(item);
+    return {
+      success: true,
+      data: item,
+    };
   }
 }

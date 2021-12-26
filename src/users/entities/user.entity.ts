@@ -1,4 +1,4 @@
-import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Base } from 'src/common/entities/base.entity';
 import { Role } from 'src/common/enums/role.enum';
 import { Employee } from 'src/employees/entities/employee.entity';
 import { Log } from 'src/logs/entities/log.entity';
@@ -9,14 +9,11 @@ import {
   Entity,
   OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity('users')
-export class User extends CreateUpdateAt {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class User extends Base {
   @Column({ type: 'enum', enum: Role, default: Role.STORE_EMPLOYEE })
   role: string;
   @Column({ unique: true })
@@ -25,11 +22,12 @@ export class User extends CreateUpdateAt {
   password: string;
   @OneToOne(() => Employee, (employee) => employee.user, {
     onDelete: 'CASCADE',
-    
   })
   employee: Employee;
 
-  @OneToMany(() => Log, (log) => log.user)
+  @OneToMany(() => Log, (log) => log.user, {
+    onDelete: 'CASCADE',
+  })
   logs: Log[];
 
   @BeforeInsert()

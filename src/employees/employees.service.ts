@@ -37,8 +37,12 @@ export class EmployeesService {
     employee.user = user;
     employee.department = department;
 
-    this.logsService.create({ action: `Create an Employee`});
-    return this.employeeRepository.save(employee);
+    await this.employeeRepository.save(employee);
+    this.logsService.create({ action: `Create an Employee` });
+    return {
+      success: true,
+      data: employee,
+    };
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Employee>> {
@@ -54,7 +58,7 @@ export class EmployeesService {
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
-this.logsService.create({ action: `Get All Employees`});
+    this.logsService.create({ action: `Get All Employees` });
     return paginate<Employee>(
       this.employeeRepository,
       {
@@ -72,8 +76,11 @@ this.logsService.create({ action: `Get All Employees`});
     if (!employee) {
       throw new NotFoundException(`employee with id: ${id} not found`);
     }
-this.logsService.create({ action: `Get single employee with id: ${id}`});
-    return employee;
+    this.logsService.create({ action: `Get single employee with id: ${id}` });
+    return {
+      success: true,
+      data: employee,
+    };
   }
 
   async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
@@ -84,7 +91,11 @@ this.logsService.create({ action: `Get single employee with id: ${id}`});
     if (!employee) {
       throw new NotFoundException(`employee with id: ${id} not found`);
     }
-this.logsService.create({ action: `Update Employee with id: ${id}`});
-    return this.employeeRepository.save(employee);
+    await this.employeeRepository.save(employee);
+    this.logsService.create({ action: `Update Employee with id: ${id}` });
+    return {
+      success: true,
+      data: employee,
+    };
   }
 }

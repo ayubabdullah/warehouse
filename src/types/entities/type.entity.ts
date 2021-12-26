@@ -1,18 +1,9 @@
-import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Base } from 'src/common/entities/base.entity';
 import { Item } from 'src/items/entities/item.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity('types')
-export class Type extends CreateUpdateAt {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Type extends Base {
   @Column()
   name: string;
   @OneToMany(() => Item, (item) => item.type)

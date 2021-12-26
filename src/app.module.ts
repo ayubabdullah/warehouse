@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemsModule } from './items/items.module';
 import { DepartmentsModule } from './departments/departments.module';
@@ -9,11 +9,12 @@ import { AuthModule } from './auth/auth.module';
 import { CategoryModule } from './category/category.module';
 import { TypesModule } from './types/types.module';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RoleGuard } from './auth/guards/role.guard';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemsModule } from './order-items/order-items.module';
+import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 
 
 @Module({
@@ -43,7 +44,6 @@ import { OrderItemsModule } from './order-items/order-items.module';
     OrdersModule,
     OrderItemsModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_GUARD,
@@ -52,6 +52,10 @@ import { OrderItemsModule } from './order-items/order-items.module';
     {
       provide: APP_GUARD,
       useClass: RoleGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })

@@ -17,8 +17,12 @@ export class OrdersService {
   ) {}
   async create(createOrderDto: CreateOrderDto) {
     const order = await this.orderRepository.create(createOrderDto);
+    await this.orderRepository.save(order);
     this.logsService.create({ action: `Create an order` });
-    return this.orderRepository.save(order);
+    return {
+      success: true,
+      data: order,
+    };
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Order>> {
@@ -31,7 +35,7 @@ export class OrdersService {
       query.select = ['id', ...fields, 'createdAt'];
     }
     query.order = { createdAt: -1 };
-    query.relations = ['orderItems']
+    query.relations = ['orderItems'];
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
@@ -48,12 +52,17 @@ export class OrdersService {
   }
 
   async findOne(id: number) {
-    const order = await this.orderRepository.findOne(id,{relations:['orderItems']});
+    const order = await this.orderRepository.findOne(id, {
+      relations: ['orderItems'],
+    });
     if (!order) {
       throw new NotFoundException(`order with id: ${id} not found`);
     }
     this.logsService.create({ action: `Get single order with id: ${id}` });
-    return order;
+    return {
+      success: true,
+      data: order,
+    };
   }
 
   async update(id: number, updateOrderDto: UpdateOrderDto) {
@@ -64,15 +73,26 @@ export class OrdersService {
     if (!order) {
       throw new NotFoundException(`order with id: ${id} not found`);
     }
+    await this.orderRepository.save(order);
     this.logsService.create({ action: `Update order with id: ${id}` });
-    return this.orderRepository.save(order);
+    return {
+      success: true,
+      data: order,
+    };
   }
 
   async remove(id: number) {
-    const order = await this.findOne(id);
+    const order = await this.orderRepository.findOne(id);
+    if (!order) {
+      throw new NotFoundException(`order with id: ${id} not found`);
+    }
+    await this.orderRepository.remove(order);
     this.logsService.create({
       action: `Delete order with client phone: ${order.clientPhone}`,
     });
-    return this.orderRepository.remove(order);
+    return {
+      success: true,
+      data: order,
+    };
   }
 }

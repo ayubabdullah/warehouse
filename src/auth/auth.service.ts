@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -8,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
-import { LogsService } from 'src/logs/logs.service';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 
@@ -31,7 +29,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: any, res: Response) {
+  async login(user: User, res: Response) {
     const payload = { sub: user.id };
     const token = this.jwtService.sign(payload);
     const options = {
@@ -54,9 +52,7 @@ export class AuthService {
   }
 
   async verifyPayload(payload): Promise<User> {
-    let user: User;
-
-    user = await this.userRepository.findOne(payload.sub);
+    const user = await this.userRepository.findOne(payload.sub);
     if (!user) {
       throw new NotFoundException(`user with id: ${payload.sub} not found`);
     }

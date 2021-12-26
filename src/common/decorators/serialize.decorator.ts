@@ -1,4 +1,4 @@
-import { SetMetadata, UseInterceptors } from '@nestjs/common';
+import { UseInterceptors } from '@nestjs/common';
 import { SerializeInterceptor } from '../interceptors/serialize.interceptor';
 import { ClassConstructor } from '../interfaces/ClassConstructor.interface';
 

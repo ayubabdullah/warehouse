@@ -14,10 +14,14 @@ export class TypesService {
     private readonly logsService: LogsService,
     @InjectRepository(Type) private readonly typeRepository: Repository<Type>,
   ) {}
-  create(createTypeDto: CreateTypeDto) {
+  async create(createTypeDto: CreateTypeDto) {
     const type = this.typeRepository.create(createTypeDto);
+    await this.typeRepository.save(type);
     this.logsService.create({ action: `Create a type` });
-    return this.typeRepository.save(type);
+      return {
+        success: true,
+        data: type,
+      };
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Type>> {
@@ -50,8 +54,12 @@ export class TypesService {
     if (!type) {
       throw new NotFoundException(`type with id: ${id} not found`);
     }
+    await this.typeRepository.save(type);
     this.logsService.create({ action: `Update type with id: ${id}` });
-    return this.typeRepository.save(type);
+    return {
+      success: true,
+      data: type,
+    };
   }
 
   async remove(id: number) {
@@ -59,7 +67,11 @@ export class TypesService {
     if (!type) {
       throw new NotFoundException(`type with id: ${id} not found`);
     }
+    await this.typeRepository.remove(type);
     this.logsService.create({ action: `Delete type this id: ${type.name}` });
-    return this.typeRepository.remove(type);
+    return {
+      success: true,
+      data: type,
+    };
   }
 }

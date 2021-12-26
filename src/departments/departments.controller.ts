@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { Role } from 'src/common/enums/role.enum';
 import { CreateEmployeeDto } from 'src/employees/dto/create-employee.dto';
 import { EmployeesService } from 'src/employees/employees.service';
 import { CreateItemDto } from 'src/items/dtos/create-item.dto';
@@ -31,16 +33,25 @@ export class DepartmentsController {
   ) {}
 
   // Department Controllers
+  @Roles(Role.ADMIN)
   @Post()
   create(@Body() createDepartmentDto: CreateDepartmentDto) {
     return this.departmentsService.create(createDepartmentDto);
   }
 
+  @Roles(Role.ADMIN)
   @Get()
   async findAll(@Query() qeuryDto: QueryDto): Promise<Pagination<Department>> {
     return this.departmentsService.findAll(qeuryDto);
   }
 
+  @Roles(Role.ADMIN)
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.departmentsService.findOne(+id);
+  }
+
+  @Roles(Role.ADMIN)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -49,12 +60,27 @@ export class DepartmentsController {
     return this.departmentsService.update(+id, updateDepartmentDto);
   }
 
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.departmentsService.remove(+id);
   }
 
   // Item Controllers
+  @Get(':departmentId/items')
+  getAllItems(
+    @Param('departmentId') departmentId: string,
+    @Query() queryDto: QueryDto,
+  ) {
+    return this.itemsService.findDepartmentItems(+departmentId, queryDto);
+  }
+  @Get(':departmentId/items/:id')
+  getItem(
+    @Param('departmentId') departmentId: string,
+    @Param('id') id: string,
+  ) {
+    return this.itemsService.findDepartmentItem(+departmentId, +id);
+  }
 
   @Post(':departmentId/items')
   createItem(
@@ -71,7 +97,7 @@ export class DepartmentsController {
     @Param('id') id: string,
     @Body() body: UpdateItemDto,
   ) {
-    return this.itemsService.update(+departmentId, user, id, body);
+    return this.itemsService.update(+departmentId, user, +id, body);
   }
   @Delete(':departmentId/items/:id')
   removeItem(
@@ -79,10 +105,11 @@ export class DepartmentsController {
     @AuthUser() user: User,
     @Param('id') id: string,
   ) {
-    return this.itemsService.remove(+departmentId, user, id);
+    return this.itemsService.remove(+departmentId, user, +id);
   }
 
   // Employee Controllers
+  @Roles(Role.ADMIN)
   @Post(':departmentId/employees')
   createEmployee(
     @Param('departmentId') departmentId: string,

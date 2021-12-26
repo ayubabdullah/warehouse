@@ -1,9 +1,9 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsPhoneNumber, IsString } from 'class-validator';
 
 export class CreateOrderDto {
   @IsString()
   clientName: string;
-  @IsString()
+  @IsPhoneNumber('IQ')
   clientPhone: string;
   @IsOptional()
   @IsString()
