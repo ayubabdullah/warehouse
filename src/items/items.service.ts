@@ -14,7 +14,6 @@ import {
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
-import * as faker from 'faker';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Employee } from 'src/employees/entities/employee.entity';

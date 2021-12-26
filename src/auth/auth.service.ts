@@ -28,7 +28,6 @@ export class AuthService {
     if (!(await user.checkPassword(password))) {
       throw new UnauthorizedException('invalid credentials');
     }
-    delete user.password;
     return user;
   }
 
@@ -61,8 +60,6 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`user with id: ${payload.sub} not found`);
     }
-    delete user.password;
-
     return user;
   }
 }

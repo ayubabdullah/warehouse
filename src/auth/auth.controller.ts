@@ -12,10 +12,13 @@ import {
 } from '@nestjs/common';
 import { AuthUser } from 'src/common/decorators/auth-user.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
+import { UserDto } from 'src/users/dto/user.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
+@Serialize(UserDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

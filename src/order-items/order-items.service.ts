@@ -30,15 +30,15 @@ export class OrderItemsService {
     if (!order) {
       throw new NotFoundException(`order with id: ${orderId} not found`);
     }
-
-    const orderItem = await this.orderItemRepository.create(createOrderItemDto);
-    orderItem.order = order;
     if (item.quantity - quantity <= 0) {
       throw new BadRequestException(
         `there is not enough quantity of that item, you request ${quantity} items and there is ${item.quantity} in warehouse`,
       );
     }
-    item.quantity = item.quantity - quantity;
+    const orderItem = await this.orderItemRepository.create(createOrderItemDto);
+    orderItem.order = order;
+
+    item.quantity -= quantity;
     await this.itemRepository.save(item);
     return this.orderItemRepository.save(orderItem);
   }
@@ -58,7 +58,11 @@ export class OrderItemsService {
     if (!orderItem) {
       throw new NotFoundException(`orderItem with id: ${id} not found`);
     }
-
+    if (!(orderItem.order.id === orderId)) {
+      throw new BadRequestException(
+        `this orderItem doesn't belonge to this order with id: ${orderId}`,
+      );
+    }
     if (updateOrderItemDto.quantity) {
       if (orderItem.quantity > updateOrderItemDto.quantity) {
         orderItem.item.quantity +=
@@ -72,12 +76,6 @@ export class OrderItemsService {
         orderItem.item.quantity -=
           updateOrderItemDto.quantity - orderItem.quantity;
       }
-    }
-
-    if (!(orderItem.order.id === orderId)) {
-      throw new BadRequestException(
-        `this orderItem doesn't belonge to this order with id: ${orderId}`,
-      );
     }
 
     await this.itemRepository.save(orderItem.item);

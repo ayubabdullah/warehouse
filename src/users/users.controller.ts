@@ -16,11 +16,15 @@ import { Role } from 'src/common/enums/role.enum';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { User } from './entities/user.entity';
+import { LogsService } from 'src/logs/logs.service';
 
 @Roles(Role.ADMIN)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly logsService: LogsService,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -28,8 +32,8 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(@Query() qeuryDto: QueryDto): Promise<Pagination<User>> {
-    return this.usersService.findAll(qeuryDto);
+  async findAll(@Query() queryDto: QueryDto): Promise<Pagination<User>> {
+    return this.usersService.findAll(queryDto);
   }
 
   @Get(':id')
@@ -37,6 +41,10 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
+  @Get(':id/logs')
+  findUserLogs(@Param('id') id: string, @Query() queryDto: QueryDto) {
+    return this.logsService.findUserLogs(+id, queryDto);
+  }
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);

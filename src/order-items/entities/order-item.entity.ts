@@ -1,7 +1,14 @@
-import { CreateUpdateAt } from "src/common/entities/create-update-at.entity";
-import { Item } from "src/items/entities/item.entity";
-import { Order } from "src/orders/entities/order.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
+import { CreateUpdateAt } from 'src/common/entities/create-update-at.entity';
+import { Item } from 'src/items/entities/item.entity';
+import { Order } from 'src/orders/entities/order.entity';
+import {
+  BeforeRemove,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+} from 'typeorm';
 
 @Entity('order-items')
 export class OrderItem extends CreateUpdateAt {

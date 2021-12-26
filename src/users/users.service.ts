@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { Log } from 'src/logs/entities/log.entity';
 import { LogsService } from 'src/logs/logs.service';
 import { Like, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -54,6 +55,7 @@ export class UsersService {
     return user;
   }
 
+  
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.preload({ id, ...updateUserDto });
     if (!user) {
