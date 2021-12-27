@@ -105,21 +105,23 @@ export class DepartmentsController {
     @AuthUser() user: User,
     @Param('id') id: string,
   ) {
-    return this.itemsService.remove(+departmentId, user, +id);
+    return this.itemsService.removeDepartmentItem(+departmentId, user, +id);
   }
 
   // Employee Controllers
   @Roles(Role.ADMIN)
-  @Post(':departmentId/employees')
-  createEmployee(
+  @Get(':departmentId/employees')
+  getAllEmployees(
     @Param('departmentId') departmentId: string,
-    @AuthUser() user: User,
-    @Body() createEmpployeeDto: CreateEmployeeDto,
+    @Query() queryDto: QueryDto,
   ) {
-    return this.employeesService.create(
-      +departmentId,
-      user,
-      createEmpployeeDto,
-    );
+    return this.employeesService.findDepartmentEmployees(+departmentId, queryDto);
+  }
+  @Get(':departmentId/employees/:id')
+  getEmployee(
+    @Param('departmentId') departmentId: string,
+    @Param('id') id: string,
+  ) {
+    return this.employeesService.findDepartmentEmployee(+departmentId, +id);
   }
 }

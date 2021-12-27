@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
@@ -69,7 +69,34 @@ export class EmployeesService {
       query,
     );
   }
+  async findDepartmentEmployees(
+    departmentId: number,
+    queryDto: QueryDto,
+  ): Promise<Pagination<Employee>> {
+    const department = await this.departmentRepository.findOne(departmentId);
+    if (!department) {
+      throw new NotFoundException(
+        `department with id: ${departmentId} not found`,
+      );
+    }
 
+    let query: any = {};
+    const page = queryDto.page || 1;
+    const limit = queryDto.limit || 25;
+    query.order = { createdAt: -1 };
+    query.where = { department };
+
+    this.logsService.create({ action: `Get department's employees` });
+    return paginate<Employee>(
+      this.employeeRepository,
+      {
+        page,
+        limit,
+        route: `http://localhost:5000/api/v1/departments/${departmentId}/employees`,
+      },
+      query,
+    );
+  }
   async findOne(id: number) {
     const employee = await this.employeeRepository.findOne(id);
 
@@ -82,7 +109,25 @@ export class EmployeesService {
       data: employee,
     };
   }
+  async findDepartmentEmployee(departmentId: number, id: number) {
+    const employee = await this.employeeRepository.findOne(id, {
+      relations: ['department'],
+    });
 
+    if (!employee) {
+      throw new NotFoundException(`employee with id: ${id} not found`);
+    }
+    if (!(employee.department.id === departmentId)) {
+      throw new UnauthorizedException(
+        `employee ${id} doesn't belonge to this department`,
+      );
+    }
+    this.logsService.create({ action: `Get single employee this id: ${id}` });
+    return {
+      success: true,
+      data: employee,
+    };
+  }
   async update(id: number, updateEmployeeDto: UpdateEmployeeDto) {
     const employee = await this.employeeRepository.preload({
       id,
