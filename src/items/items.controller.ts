@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { QueryDto } from 'src/common/dto/query.dto';
@@ -18,5 +18,9 @@ export class ItemsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.itemsService.findOne(+id);
+  }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.itemsService.remove(+id);
   }
 }

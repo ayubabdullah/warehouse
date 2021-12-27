@@ -13,6 +13,6 @@ export class OrderItem extends Base {
   quantity: number;
   @ManyToOne(() => Order, (order) => order.orderItems)
   order: Order;
-  @ManyToOne(() => Item, (item) => item.orderItems)
+  @ManyToOne(() => Item, (item) => item.orderItems, {onDelete: 'SET NULL'})
   item: Item;
 }

@@ -59,8 +59,8 @@ export class CategoryService {
     if (!category) {
       throw new NotFoundException(`category with id: ${id} not found`);
     }
-    this.logsService.create({ action: `Update category with id: ${id}` });
     await this.categoryRepository.save(category);
+    this.logsService.create({ action: `Update category with id: ${id}` });
     return {
       success: true,
       data: category,
@@ -69,14 +69,13 @@ export class CategoryService {
 
   async remove(id: number) {
     const category = await this.categoryRepository.findOne(id);
-
     if (!category) {
       throw new NotFoundException(`category with id: ${id} not found`);
     }
+    await this.categoryRepository.remove(category);
     this.logsService.create({
       action: `Remove category with name: ${category.name}`,
     });
-    await this.categoryRepository.remove(category);
     return {
       success: true,
       data: category,

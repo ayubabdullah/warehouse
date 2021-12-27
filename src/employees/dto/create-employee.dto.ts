@@ -1,4 +1,5 @@
 import {
+  IsDate,
   IsIn,
   IsNumber,
   IsOptional,
@@ -17,8 +18,8 @@ export class CreateEmployeeDto {
   @IsString()
   @IsIn(['male', 'female'])
   gender: string;
-  @IsString()
-  startedAt: String;
+  @IsDate()
+  startedAt: Date;
   @IsString()
   @IsOptional()
   note: string;

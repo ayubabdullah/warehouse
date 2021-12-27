@@ -91,7 +91,9 @@ export class ItemsService {
     };
   }
   async findDepartmentItem(departmentId: number, id: number) {
-    const item = await this.itemRepository.findOne(id,{relations: ['department']});
+    const item = await this.itemRepository.findOne(id, {
+      relations: ['department'],
+    });
 
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
@@ -164,7 +166,19 @@ export class ItemsService {
       data: item,
     };
   }
-  async remove(departmentId: number, user: User, id: number) {
+  async remove(id: number) {
+    const item = await this.itemRepository.findOne(id);
+    if (!item) {
+      throw new NotFoundException(`item with id: ${id} not found`);
+    }
+    await this.itemRepository.remove(item);
+    this.logsService.create({ action: `Delete item this name: ${item.name}` });
+    return {
+      success: true,
+      data: item,
+    };
+  }
+  async removeDepartmentItem(departmentId: number, user: User, id: number) {
     const employee = await this.employeeRepository.findOne({ user });
     if (!employee) {
       throw new NotFoundException(`employee with id: ${user.id} not found`);

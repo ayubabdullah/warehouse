@@ -24,7 +24,7 @@ export class Item extends Base {
   @Column({ nullable: true })
   note: string;
 
-  @ManyToOne(() => Type, (type) => type.items)
+  @ManyToOne(() => Type, (type) => type.items, {onDelete: 'SET NULL'})
   type: Type;
 
   @ManyToOne(() => Category, (category) => category.items)

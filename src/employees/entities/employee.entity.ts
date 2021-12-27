@@ -2,7 +2,7 @@ import { Base } from 'src/common/entities/base.entity';
 import { Genders } from 'src/common/enums/gender.enum';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity('employees')
 export class Employee extends Base {
@@ -18,8 +18,7 @@ export class Employee extends Base {
   startedAt: Date;
   @Column()
   note: string;
-  @OneToOne(() => User, (user) => user.employee)
-  @JoinColumn()
+  @OneToOne(() => User, (user) => user.employee, { onDelete: 'CASCADE' })
   user: User;
   @ManyToOne(() => Department, (department) => department.employees)
   department: Department;

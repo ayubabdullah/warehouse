@@ -7,6 +7,7 @@ import {
   BeforeUpdate,
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
 } from 'typeorm';
@@ -21,8 +22,9 @@ export class User extends Base {
   @Column()
   password: string;
   @OneToOne(() => Employee, (employee) => employee.user, {
-    onDelete: 'CASCADE',
+    cascade: true,
   })
+  @JoinColumn()
   employee: Employee;
 
   @OneToMany(() => Log, (log) => log.user, {
