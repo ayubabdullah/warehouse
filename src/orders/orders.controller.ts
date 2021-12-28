@@ -17,6 +17,8 @@ import { Order } from './entities/order.entity';
 import { OrderItemsService } from 'src/order-items/order-items.service';
 import { CreateOrderItemDto } from 'src/order-items/dto/create-order-item.dto';
 import { UpdateOrderItemDto } from 'src/order-items/dto/update-order-item.dto';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/common/enums/role.enum';
 
 @Controller('orders')
 export class OrdersController {
@@ -25,33 +27,24 @@ export class OrdersController {
     private readonly orderItemsService: OrderItemsService,
   ) {}
 
-  @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
-  }
-
+  @Roles(Role.ADMIN)
   @Get()
   async findAll(@Query() qeuryDto: QueryDto): Promise<Pagination<Order>> {
     return this.ordersService.findAll(qeuryDto);
   }
-
+  @Roles(Role.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
-  }
-
+  @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ordersService.remove(+id);
   }
 
   // OrderItem Controllers
-
   @Post(':orderId/orderitems')
   createOrderItem(
     @Param('orderId') orderId: string,

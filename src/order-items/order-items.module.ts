@@ -7,7 +7,7 @@ import { Order } from 'src/orders/entities/order.entity';
 import { Item } from 'src/items/entities/item.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderItem, Order, Item]), LogsModule],
+  imports: [TypeOrmModule.forFeature([OrderItem, Order, Item])],
   providers: [OrderItemsService],
   exports: [OrderItemsService],
 })

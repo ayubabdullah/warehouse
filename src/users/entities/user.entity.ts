@@ -1,17 +1,17 @@
 import { Base } from 'src/common/entities/base.entity';
 import { Role } from 'src/common/enums/role.enum';
-import { Employee } from 'src/employees/entities/employee.entity';
 import { Log } from 'src/logs/entities/log.entity';
 import {
   BeforeInsert,
   BeforeUpdate,
   Column,
   Entity,
-  JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { Genders } from 'src/common/enums/gender.enum';
+import { Department } from 'src/departments/entities/department.entity';
 
 @Entity('users')
 export class User extends Base {
@@ -21,15 +21,21 @@ export class User extends Base {
   phone: string;
   @Column()
   password: string;
-  @OneToOne(() => Employee, (employee) => employee.user, {
-    cascade: true,
-  })
-  @JoinColumn()
-  employee: Employee;
-
-  @OneToMany(() => Log, (log) => log.user, {
-    onDelete: 'CASCADE',
-  })
+  @Column()
+  name: string;
+  @Column()
+  address: string;
+  @Column({ nullable: true })
+  salary: number;
+  @Column({ type: 'enum', enum: Genders, default: Genders.MALE })
+  gender: string;
+  @Column()
+  startedAt: Date;
+  @Column({ nullable: true })
+  note: string;
+  @ManyToOne(() => Department, (department) => department.users)
+  department: Department;
+  @OneToMany(() => Log, (log) => log.user)
   logs: Log[];
 
   @BeforeInsert()

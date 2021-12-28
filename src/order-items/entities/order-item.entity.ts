@@ -11,7 +11,7 @@ import {
 export class OrderItem extends Base {
   @Column()
   quantity: number;
-  @ManyToOne(() => Order, (order) => order.orderItems)
+  @ManyToOne(() => Order, (order) => order.orderItems, {onDelete: 'SET NULL'})
   order: Order;
   @ManyToOne(() => Item, (item) => item.orderItems, {onDelete: 'SET NULL'})
   item: Item;

@@ -52,7 +52,7 @@ export class DepartmentsService {
 
   async findOne(id: number) {
     const department = await this.departmentRepository.findOne(id, {
-      relations: ['items', 'employees'],
+      relations: ['users'],
     });
     if (!department) {
       throw new NotFoundException(`department with id: ${id} not found`);

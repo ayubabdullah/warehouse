@@ -14,11 +14,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Public()
   @Post('login')
-  async login(@AuthUser() user, @Response() res) {
+  async login(@AuthUser() user, @Response({ passthrough: true }) res) {
     return this.authService.login(user, res);
   }
   @Get('logout')
-  async logout(@Response() res) {
+  async logout(@Response({ passthrough: true }) res) {
     return this.authService.logout(res);
   }
   @Get('me')

@@ -28,7 +28,7 @@ export class OrderItemsService {
     if (!order) {
       throw new NotFoundException(`order with id: ${orderId} not found`);
     }
-    if (item.quantity - quantity <= 0) {
+    if (item.quantity - quantity < 0) {
       throw new BadRequestException(
         `there is not enough quantity of that item, you request ${quantity} items and there is ${item.quantity} in warehouse`,
       );
@@ -41,8 +41,8 @@ export class OrderItemsService {
     await this.orderItemRepository.save(orderItem);
     return {
       success: true,
-      data: orderItem
-    }
+      data: orderItem,
+    };
   }
 
   async update(
@@ -50,12 +50,9 @@ export class OrderItemsService {
     id: number,
     updateOrderItemDto: UpdateOrderItemDto,
   ) {
-    const order = await this.orderRepository.findOne(orderId);
-
-    if (!order) {
-      throw new NotFoundException(`order with id: ${orderId} not found`);
-    }
-    let orderItem = await this.orderItemRepository.findOne(id);
+    let orderItem = await this.orderItemRepository.findOne(id, {
+      relations: ['order', 'item'],
+    });
 
     if (!orderItem) {
       throw new NotFoundException(`orderItem with id: ${id} not found`);
@@ -70,7 +67,11 @@ export class OrderItemsService {
         orderItem.item.quantity +=
           orderItem.quantity - updateOrderItemDto.quantity;
       } else {
-        if (orderItem.item.quantity - updateOrderItemDto.quantity <= 0) {
+        if (
+          orderItem.item.quantity -
+            (updateOrderItemDto.quantity - orderItem.quantity) <
+          0
+        ) {
           throw new BadRequestException(
             `there is not enough quantity of that item`,
           );
@@ -94,13 +95,9 @@ export class OrderItemsService {
   }
 
   async remove(orderId: number, id: number) {
-    const order = await this.orderRepository.findOne(orderId);
-
-    if (!order) {
-      throw new NotFoundException(`order with id: ${orderId} not found`);
-    }
-
-    const orderItem = await this.orderItemRepository.findOne(id);
+    const orderItem = await this.orderItemRepository.findOne(id, {
+      relations: ['order', 'item'],
+    });
     if (!orderItem) {
       throw new NotFoundException(`orderItem with id: ${id} not found`);
     }
@@ -109,6 +106,21 @@ export class OrderItemsService {
       throw new BadRequestException(
         `this orderItem doesn't belonge to this order with id: ${orderId}`,
       );
+    }
+    orderItem.item.quantity += orderItem.quantity;
+    await this.itemRepository.save(orderItem.item);
+    await this.orderItemRepository.remove(orderItem);
+    return {
+      success: true,
+      data: orderItem,
+    };
+  }
+  async returnItem(id: number) {
+    const orderItem = await this.orderItemRepository.findOne(id, {
+      relations: ['order', 'item'],
+    });
+    if (!orderItem) {
+      throw new NotFoundException(`orderItem with id: ${id} not found`);
     }
     orderItem.item.quantity += orderItem.quantity;
     await this.itemRepository.save(orderItem.item);

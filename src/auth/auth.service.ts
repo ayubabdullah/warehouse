@@ -40,7 +40,7 @@ export class AuthService {
       httpOnly: true,
     };
 
-    res.cookie('token', token, options).json({ token });
+    res.cookie('token', token, options).json({ success: true, token });
   }
   async logout(res: Response) {
     res
@@ -48,11 +48,13 @@ export class AuthService {
         expires: new Date(Date.now() + 10 * 1000),
         httpOnly: true,
       })
-      .json({ success: true });
+      .json({ success: true, token: 'none' });
   }
 
   async verifyPayload(payload): Promise<User> {
-    const user = await this.userRepository.findOne(payload.sub);
+    const user = await this.userRepository.findOne(payload.sub, {
+      relations: ['department'],
+    });
     if (!user) {
       throw new NotFoundException(`user with id: ${payload.sub} not found`);
     }

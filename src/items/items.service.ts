@@ -12,7 +12,6 @@ import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Employee } from 'src/employees/entities/employee.entity';
 import { LogsService } from 'src/logs/logs.service';
 
 @Injectable()
@@ -20,12 +19,10 @@ export class ItemsService {
   constructor(
     private readonly logsService: LogsService,
     @InjectRepository(Item) private readonly itemRepository: Repository<Item>,
-    @InjectRepository(Employee)
-    private readonly employeeRepository: Repository<Employee>,
     @InjectRepository(Department)
     private readonly departmentRepository: Repository<Department>,
   ) {}
-
+  // Admin Only
   async findAll(queryDto: QueryDto): Promise<Pagination<Item>> {
     let query: any = {};
     const page = queryDto.page || 1;
@@ -36,6 +33,7 @@ export class ItemsService {
       query.select = ['id', ...fields, 'createdAt'];
     }
     query.order = { createdAt: -1 };
+    query.relations = ['category', 'type', 'department'];
     if (queryDto.search) {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
@@ -64,6 +62,7 @@ export class ItemsService {
     let query: any = {};
     const page = queryDto.page || 1;
     const limit = queryDto.limit || 25;
+    query.relations = ['category', 'type'];
     query.order = { createdAt: -1 };
     query.where = { department };
 
@@ -78,8 +77,11 @@ export class ItemsService {
       query,
     );
   }
+  // Admin Only
   async findOne(id: number) {
-    const item = await this.itemRepository.findOne(id);
+    const item = await this.itemRepository.findOne(id, {
+      relations: ['category', 'type', 'department'],
+    });
 
     if (!item) {
       throw new NotFoundException(`item with id: ${id} not found`);
@@ -92,7 +94,7 @@ export class ItemsService {
   }
   async findDepartmentItem(departmentId: number, id: number) {
     const item = await this.itemRepository.findOne(id, {
-      relations: ['department'],
+      relations: ['category', 'type', 'department'],
     });
 
     if (!item) {
@@ -117,13 +119,10 @@ export class ItemsService {
         `department with id: ${departmentId} not found`,
       );
     }
-    const employee = await this.employeeRepository.findOne({ user });
-    if (!employee) {
-      throw new NotFoundException(`employee with id: ${user.id} not found`);
-    }
-    if (!(employee.department.id === departmentId)) {
+
+    if (!(user.department.id === departmentId)) {
       throw new UnauthorizedException(
-        `employee ${employee.id} is not authorize to add item`,
+        `user ${user.id} is not authorize to add item`,
       );
     }
 
@@ -142,13 +141,9 @@ export class ItemsService {
     id: number,
     updateItemDto: UpdateItemDto,
   ) {
-    const employee = await this.employeeRepository.findOne({ user });
-    if (!employee) {
-      throw new NotFoundException(`employee with id: ${user.id} not found`);
-    }
-    if (!(employee.department.id === departmentId)) {
+    if (!(user.department.id === departmentId)) {
       throw new UnauthorizedException(
-        `employee ${employee.id} is not authorize to update item`,
+        `user ${user.id} is not authorize to update item`,
       );
     }
     const item = await this.itemRepository.preload({
@@ -166,6 +161,7 @@ export class ItemsService {
       data: item,
     };
   }
+  // Admin Only
   async remove(id: number) {
     const item = await this.itemRepository.findOne(id);
     if (!item) {
@@ -179,13 +175,9 @@ export class ItemsService {
     };
   }
   async removeDepartmentItem(departmentId: number, user: User, id: number) {
-    const employee = await this.employeeRepository.findOne({ user });
-    if (!employee) {
-      throw new NotFoundException(`employee with id: ${user.id} not found`);
-    }
-    if (!(employee.department.id === departmentId)) {
+    if (!(user.department.id === departmentId)) {
       throw new UnauthorizedException(
-        `employee ${employee.id} is not authorize to delete item`,
+        `user ${user.id} is not authorize to delete item`,
       );
     }
     const item = await this.itemRepository.findOne(id);
