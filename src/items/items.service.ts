@@ -12,7 +12,7 @@ import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Department } from 'src/departments/entities/department.entity';
 import { User } from 'src/users/entities/user.entity';
-import { LogsService } from 'src/logs/logs.service';
+import { LogsService } from 'src/logging/logging.service';
 
 @Injectable()
 export class ItemsService {

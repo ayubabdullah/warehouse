@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { OrderItemsService } from './order-items.service';
 import { OrderItem } from './entities/order-item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LogsModule } from 'src/logs/logs.module';
+import { LogsModule } from 'src/logging/logging.module';
 import { Order } from 'src/orders/entities/order.entity';
 import { Item } from 'src/items/entities/item.entity';
 

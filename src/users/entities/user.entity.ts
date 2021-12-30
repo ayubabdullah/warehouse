@@ -1,6 +1,6 @@
 import { Base } from 'src/common/entities/base.entity';
 import { Role } from 'src/common/enums/role.enum';
-import { Log } from 'src/logs/entities/log.entity';
+import { Log } from 'src/logging/entities/log.entity';
 import {
   BeforeInsert,
   BeforeUpdate,

@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Department } from 'src/departments/entities/department.entity';
-import { LogsService } from 'src/logs/logs.service';
+import { LogsService } from 'src/logging/logging.service';
 import { OrderItemsService } from 'src/order-items/order-items.service';
 import { User } from 'src/users/entities/user.entity';
 import { Like, Repository } from 'typeorm';

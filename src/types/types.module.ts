@@ -3,7 +3,7 @@ import { TypesService } from './types.service';
 import { TypesController } from './types.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Type } from './entities/type.entity';
-import { LogsModule } from 'src/logs/logs.module';
+import { LogsModule } from 'src/logging/logging.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Type]), LogsModule],

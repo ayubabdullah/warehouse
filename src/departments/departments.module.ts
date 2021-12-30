@@ -4,7 +4,7 @@ import { DepartmentsController } from './departments.controller';
 import { Department } from './entities/department.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ItemsModule } from 'src/items/items.module';
-import { LogsModule } from 'src/logs/logs.module';
+import { LogsModule } from 'src/logging/logging.module';
 import { UsersModule } from 'src/users/users.module';
 import { OrdersModule } from 'src/orders/orders.module';
 
