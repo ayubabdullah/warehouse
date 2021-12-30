@@ -11,7 +11,9 @@ export class Order extends Base {
   clientPhone: string;
   @Column()
   note: string;
-  @ManyToOne(() => Department, (department) => department.orders)
+  @ManyToOne(() => Department, (department) => department.orders, {
+    onDelete: 'CASCADE',
+  })
   department: Department;
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
   orderItems: OrderItem[];

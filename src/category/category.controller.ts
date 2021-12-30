@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { Pagination } from 'nestjs-typeorm-paginate';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { QueryDto } from 'src/common/dto/query.dto';
+import { Role } from 'src/common/enums/role.enum';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
-
+@Roles(Role.ADMIN)
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}

@@ -14,7 +14,7 @@ import { RoleGuard } from './auth/guards/role.guard';
 import { OrdersModule } from './orders/orders.module';
 import { OrderItemsModule } from './order-items/order-items.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -31,7 +31,10 @@ import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
         synchronize: true,
       }),
     }),
-
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
     ItemsModule,
     DepartmentsModule,
     LogsModule,
@@ -54,6 +57,10 @@ import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

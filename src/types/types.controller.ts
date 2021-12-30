@@ -5,7 +5,9 @@ import { UpdateTypeDto } from './dto/update-type.dto';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import { Type } from './entities/type.entity';
-
+import { Roles } from 'src/common/decorators/role.decorator';
+import { Role } from 'src/common/enums/role.enum';
+@Roles(Role.ADMIN)
 @Controller('types')
 export class TypesController {
   constructor(private readonly typesService: TypesService) {}

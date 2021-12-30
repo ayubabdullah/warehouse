@@ -33,7 +33,9 @@ export class User extends Base {
   startedAt: Date;
   @Column({ nullable: true })
   note: string;
-  @ManyToOne(() => Department, (department) => department.users)
+  @ManyToOne(() => Department, (department) => department.users, {
+    onDelete: 'CASCADE',
+  })
   department: Department;
   @OneToMany(() => Log, (log) => log.user)
   logs: Log[];

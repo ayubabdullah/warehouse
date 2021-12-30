@@ -24,13 +24,17 @@ export class Item extends Base {
   @Column({ nullable: true })
   note: string;
 
-  @ManyToOne(() => Type, (type) => type.items, {onDelete: 'SET NULL'})
+  @ManyToOne(() => Type, (type) => type.items, { onDelete: 'SET NULL' })
   type: Type;
 
-  @ManyToOne(() => Category, (category) => category.items)
+  @ManyToOne(() => Category, (category) => category.items, {
+    onDelete: 'SET NULL',
+  })
   category: Category;
 
-  @ManyToOne(() => Department, (department) => department.items)
+  @ManyToOne(() => Department, (department) => department.items, {
+    onDelete: 'CASCADE',
+  })
   department: Department;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.item)
