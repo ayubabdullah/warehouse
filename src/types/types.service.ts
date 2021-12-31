@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { LogsService } from 'src/logging/logging.service';
@@ -13,18 +14,22 @@ export class TypesService {
   constructor(
     private readonly logsService: LogsService,
     @InjectRepository(Type) private readonly typeRepository: Repository<Type>,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
   async create(createTypeDto: CreateTypeDto) {
     const type = this.typeRepository.create(createTypeDto);
     await this.typeRepository.save(type);
     this.logsService.create({ action: `Create a type` });
-      return {
-        success: true,
-        data: type,
-      };
+    return {
+      success: true,
+      data: type,
+    };
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Type>> {
+    let types: Pagination<Type> = await this.cache.get('types');
+    if (types) return types;
+
     let query: any = {};
     const page = queryDto.page || 1;
     const limit = queryDto.limit || 25;
@@ -38,7 +43,7 @@ export class TypesService {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
     this.logsService.create({ action: `Get all types` });
-    return paginate<Type>(
+    types = await paginate<Type>(
       this.typeRepository,
       {
         page,
@@ -47,6 +52,8 @@ export class TypesService {
       },
       query,
     );
+    await this.cache.set('types', types, { ttl: 3600 });
+    return types;
   }
 
   async update(id: number, updateTypeDto: UpdateTypeDto) {

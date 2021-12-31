@@ -1,5 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { QueryDto } from 'src/common/dto/query.dto';
 import { LogsService } from 'src/logging/logging.service';
@@ -14,6 +20,7 @@ export class CategoryService {
     private readonly logsService: LogsService,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
   async create(createCategoryDto: CreateCategoryDto) {
     const category = this.categoryRepository.create(createCategoryDto);
@@ -26,6 +33,9 @@ export class CategoryService {
   }
 
   async findAll(queryDto: QueryDto): Promise<Pagination<Category>> {
+    let categories: Pagination<Category> = await this.cache.get('categories');
+    if (categories) return categories;
+
     let query: any = {};
     const page = queryDto.page || 1;
     const limit = queryDto.limit || 25;
@@ -39,15 +49,17 @@ export class CategoryService {
       query.where = { name: Like(`%${queryDto.search}%`) };
     }
     this.logsService.create({ action: 'Get all categories' });
-    return paginate<Category>(
+    categories = await paginate<Category>(
       this.categoryRepository,
       {
         page,
         limit,
-        route: 'http://localhost:5000/api/v1/items',
+        route: 'http://localhost:5000/api/v1/categories',
       },
       query,
     );
+    await this.cache.set('categories', categories, {ttl: 3600})
+    return categories
   }
 
   async update(id: number, updateCategoryDto: UpdateCategoryDto) {
