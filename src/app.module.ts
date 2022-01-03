@@ -16,10 +16,15 @@ import { OrderItemsModule } from './order-items/order-items.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import * as redisStore from 'cache-manager-redis-store';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     CacheModule.registerAsync({
       useFactory: async (configService: ConfigService) => ({
         store: redisStore,
